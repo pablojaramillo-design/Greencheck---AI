@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GreenCheck - Análisis Crítico de Greenwashing</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Serif:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #047857;
+            --primary-dark: #065f46;
+            --secondary: #dc2626;
+        }
+        
+        body {
+            font-family: 'IBM Plex Sans', sans-serif;
+            background-color: #f9fafb;
+            color: #111827;
+        }
+        
+        h1, h2, h3, h4 {
+            font-family: 'IBM Plex Serif', serif;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+        
+        .btn-secondary {
+            background-color: #e5e7eb;
+            color: #111827;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #d1d5db;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        th {
+            background-color: #f3f4f6;
+            font-weight: 600;
+        }
+        
+        .spinner {
+            border: 3px solid #f3f4f6;
+            border-top: 3px solid var(--primary);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div id="app" class="max-w-5xl mx-auto p-4 md:p-8">
+        
+        <!-- PANTALLA 1: LANDING -->
+        <div id="landing-view">
+            <div class="text-center mb-12">
+                <h1 class="text-5xl md:text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-green-700 to-emerald-600 mb-6">
+                    GreenCheck
+                </h1>
+                <p class="text-xl text-gray-700 max-w-3xl mx-auto leading-relaxed">
+                    Una página que permite medir el índice de lavado verde de la publicidad de tecnologías que dicen llamarse "verdes" o ecológicamente amigables con el medio ambiente.
+                </p>
+            </div>
+
+            <div class="card">
+                <h2 class="text-2xl font-bold text-gray-900 mb-4 flex items-center">
+                    <svg class="w-6 h-6 mr-2 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                    </svg>
+                    ¿Por qué es importante?
+                </h2>
+                <div class="text-gray-700 space-y-4 leading-relaxed">
+                    <p>El desarrollo de tecnologías llamadas "verdes" no está exento de profundas contradicciones éticas y ambientales. Mientras el triángulo del litio (Argentina, Chile y Bolivia) se convierte en un epicentro de extracción intensiva para abastecer la industria de baterías, el Congo enfrenta una crisis humanitaria derivada de la minería del cobalto, marcada por el trabajo infantil y la degradación de los ecosistemas.</p>
+                    <p>A su vez, Indonesia vive una deforestación acelerada por la expansión de la minería del níquel, indispensable para la producción de vehículos eléctricos.</p>
+                    <p class="font-semibold border-t pt-4">Ante este panorama, se hace urgente un sistema que brinde información clara y verificable sobre el impacto real de las tecnologías que se presentan como ambientalmente responsables, permitiendo un consumo verdaderamente informado. Este principio fundamenta el proyecto de tesis doctoral en Estudios de Diseño de la Universidad Pontificia Bolivariana de Medellín, desarrollado por el profesor del Departamento de Diseño de la Universidad del Valle, Pablo Andrés Jaramillo Romero, titulado "Análisis crítico del discurso visual publicitario de vehículos eléctricos en Colombia: narrativas de sostenibilidad construidas mediante estrategias de greenwash". En esta investigación se evidencian las estrategias discursivas y visuales utilizadas por la publicidad para construir una imagen de sostenibilidad, así como los impactos sociales y ecológicos que acompañan la producción y consumo de estas tecnologías.</p>
+                </div>
+            </div>
+
+            <div class="text-center mt-8">
+                <button onclick="switchToAnalysis()" class="btn-primary text-lg px-8 py-4">
+                    <svg class="inline w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    Iniciar análisis crítico
+                </button>
+            </div>
+        </div>
+
+        <!-- PANTALLA 2: ANÁLISIS -->
+        <div id="analysis-view" class="hidden">
+            <header class="text-center mb-8">
+                <h1 class="text-4xl font-bold text-gray-900 mb-2">Análisis GreenCheck</h1>
+                <p class="text-sm text-gray-500">Herramienta de análisis crítico del discurso visual publicitario</p>
+            </header>
+
+            <div class="card bg-yellow-50 border-2 border-yellow-300">
+                <h2 class="text-xl font-bold text-yellow-900 mb-3">¿Qué es el greenwashing?</h2>
+                <p class="text-gray-800 leading-relaxed">
+                    Greenwashing o lavado verde es una estrategia de marketing contemporánea en la que la publicidad utiliza recursos visuales asociados a la naturaleza —como entornos ecológicos, hojas, gotas de agua, ondas de mar o tipografías en tonos fríos como el verde y el azul— para construir una apariencia de sostenibilidad. Estas piezas suelen transmitir sensaciones de frescura, pureza y aire limpio, con el propósito de presentar productos como ambientalmente responsables. Sin embargo, detrás de esta estética "verde" se ocultan los verdaderos impactos ambientales derivados de la extracción de materias primas necesarias para la fabricación de tecnologías modernas de energía. En esencia, el greenwashing consiste en hacer parecer ecológico un producto que no lo es, omitiendo deliberadamente el origen y las consecuencias de los recursos utilizados en su producción.
+                </p>
+            </div>
+
+            <h2 class="text-2xl font-bold text-gray-900 mb-4 mt-8">Iniciar el chequeo de publicidad</h2>
+
+            <!-- SECCIÓN 1: CARGAR IMAGEN -->
+            <div class="card">
+                <h3 class="text-lg font-semibold text-gray-900 mb-3">1. Cargar imagen de la publicidad</h3>
+                <input type="file" id="image-upload" accept="image/*" class="w-full p-3 border-2 border-gray-300 rounded-lg cursor-pointer">
+                <div id="image-preview-container" class="mt-4 hidden">
+                    <img id="image-preview" class="max-h-64 mx-auto rounded-lg border-2 border-gray-200" alt="Vista previa">
+                </div>
+            </div>
+
+            <!-- SECCIÓN 2: CONFIGURAR Y ANALIZAR -->
+            <div class="card">
+                <h3 class="text-lg font-semibold text-gray-900 mb-3">2. Configurar y analizar</h3>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Criterios adicionales de análisis (opcional):</label>
+                <textarea id="additional-criteria" rows="3" class="w-full p-3 border-2 border-gray-300 rounded-lg focus:border-green-600 focus:outline-none" 
+                          placeholder="Ej: Revisar huella de carbono, analizar materiales utilizados, verificar certificaciones..."></textarea>
+                
+                <div class="flex gap-4 mt-4">
+                    <button id="analyze-button" onclick="startAnalysis()" disabled class="btn-primary flex-1 disabled:opacity-50 disabled:cursor-not-allowed">
+                        <svg class="inline w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                        </svg>
+                        Iniciar análisis
+                    </button>
+                    <button onclick="resetAnalysis()" class="btn-secondary flex-1">
+                        <svg class="inline w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                        Borrar y cargar nuevo análisis
+                    </button>
+                </div>
+
+                <div id="loading" class="hidden mt-6 text-center">
+                    <div class="spinner mx-auto"></div>
+                    <p class="text-gray-600 mt-3">Analizando imagen... Este proceso puede tardar unos segundos.</p>
+                </div>
+            </div>
+
+            <!-- SECCIÓN 3: RESULTADOS DEL ANÁLISIS -->
+            <div id="results-section" class="hidden">
+                <h2 class="text-2xl font-bold text-gray-900 mb-4 mt-8">3. Resultado del análisis</h2>
+
+                <!-- ÍNDICE ZIOLO-BAK -->
+                <div class="card bg-gradient-to-r from-red-50 to-orange-50 border-2 border-red-300">
+                    <h3 class="text-xl font-bold text-gray-900 mb-4 pb-3 border-b-2 border-red-400">Índice de Greenwashing Ziolo-Bak (0-100)</h3>
+                    <div id="ziolo-bak-content"></div>
+                </div>
+
+                <!-- GRÁFICO DE TELARAÑA -->
+                <div class="card">
+                    <h3 class="text-xl font-bold text-gray-900 mb-4">Análisis de Discursos Presentes (Hickman)</h3>
+                    <div class="w-full max-w-2xl mx-auto h-96">
+                        <canvas id="radar-chart"></canvas>
+                    </div>
+                </div>
+
+                <!-- DESGLOSE DE GREENWASHING -->
+                <div class="card">
+                    <h3 class="text-xl font-bold text-gray-900 mb-4">Desglose de puntuación de greenwashing</h3>
+                    <div id="breakdown-content" class="overflow-x-auto"></div>
+                </div>
+
+                <!-- INCOMPLETITUDES -->
+                <div class="card">
+                    <h3 class="text-xl font-bold text-gray-900 mb-4">Incompletitudes y contexto del discurso</h3>
+                    <p class="text-sm text-gray-600 mb-4">Simulación de conceptos detectados en textos y comentarios relacionados con la publicidad</p>
+                    <div id="incompletitudes-content" class="overflow-x-auto"></div>
+                </div>
+
+                <!-- GRÁFICO DE TORTA -->
+                <div class="card">
+                    <h3 class="text-xl font-bold text-gray-900 mb-4">Distribución de afirmaciones analizadas</h3>
+                    <div class="w-full max-w-md mx-auto h-80">
+                        <canvas id="pie-chart"></canvas>
+                    </div>
+                </div>
+
+                <!-- ANÁLISIS CUALITATIVO -->
+                <div class="card">
+                    <h3 class="text-xl font-bold text-gray-900 mb-4">Análisis de lavado verde (Greenwashing)</h3>
+                    <div id="qualitative-analysis" class="prose max-w-none"></div>
+                </div>
+
+                <!-- NUEVO: ANÁLISIS NORMATIVO Y CERTIFICACIONES -->
+                <div class="card">
+                    <h3 class="text-xl font-bold text-gray-900 mb-4">Análisis de cumplimiento normativo y certificaciones</h3>
+                    <div id="normative-analysis" class="space-y-4"></div>
+                </div>
+            </div>
+
+            <footer class="mt-12 pt-6 border-t text-center text-sm text-gray-400">
+                Diseñado por Grupo de Investigación Socua Departamento de Diseño Universidad del Valle, Grupo de investigación en Diseño de la Universidad Pontificia Bolivariana de Medellín
+            </footer>
+        </div>
+    </div>
+
+    <script>
+        // Variables globales
+        const API_KEY = "AIzaSyBBuWSxRx6tIK6El47q5qwV8ov1T_UW9GY";
+        const API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent";
+        
+        let base64Image = null;
+        let analysisData = {};
+        let radarChart = null;
+        let pieChart = null;
+
+        // Cambio de pantalla
+        function switchToAnalysis() {
+            console.log('Cambiando a análisis...');
+            document.getElementById('landing-view').classList.add('hidden');
+            document.getElementById('analysis-view').classList.remove('hidden');
+        }
+
+        // Reset
+        function resetAnalysis() {
+            document.getElementById('image-upload').value = '';
+            document.getElementById('image-preview-container').classList.add('hidden');
+            document.getElementById('additional-criteria').value = '';
+            document.getElementById('results-section').classList.add('hidden');
+            document.getElementById('analyze-button').disabled = true;
+            base64Image = null;
+            analysisData = {};
+            if (radarChart) radarChart.destroy();
+            if (pieChart) pieChart.destroy();
+        }
+
+        // Manejo de carga de imagen
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('image-upload').addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        document.getElementById('image-preview').src = event.target.result;
+                        document.getElementById('image-preview-container').classList.remove('hidden');
+                        base64Image = event.target.result.split(',')[1];
+                        document.getElementById('analyze-button').disabled = false;
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        });
+
+        // Análisis
+        async function startAnalysis() {
+            if (!base64Image) {
+                alert('Por favor carga una imagen primero');
+                return;
+            }
+
+            document.getElementById('loading').classList.remove('hidden');
+            document.getElementById('analyze-button').disabled = true;
+            document.getElementById('results-section').classList.add('hidden');
+
+            const additionalCriteria = document.getElementById('additional-criteria').value || 'Ninguno';
+
+            const systemInstruction = `Eres GreenCheck AI, un sistema experto en análisis crítico del discurso visual publicitario.
+
+GENERA UN ÚNICO OBJETO JSON con esta estructura EXACTA (sin texto adicional, solo JSON puro):
+
+{
+  "ziolo_bak": {
+    "ejecucional_empresa": {
+      "presente": true/false,
+      "componentes_detectados": "Descripción de símbolos, colores, sonidos y narrativas verdes relacionadas con la marca"
+    },
+    "afirmacion_empresa": {
+      "presente": true/false,
+      "componentes_detectados": "Descripción de declaraciones institucionales detectadas (ej: 'comprometidos con el cambio climático', 'cero emisiones', etc.)"
+    },
+    "ejecucional_producto": {
+      "presente": true/false,
+      "componentes_detectados": "Descripción de recursos visuales sostenibles (hojas, gotas, elementos ambientales por color/forma)"
+    },
+    "afirmacion_producto": {
+      "presente": true/false,
+      "componentes_detectados": "Descripción de frases ecológicas (ej: 'emisiones 0', '100% natural', 'ecológico')"
+    }
+  },
+  "discursos_hickman": {
+    "estatus_social": 75,
+    "libertad_movimiento": 85,
+    "solucion_ambiental": 60,
+    "mensaje_ecologico": 70,
+    "simplicidad_eficiencia": 50,
+    "normativas": 30
+  },
+  "desglose_greenwashing": [
+    {"criterio": "Símbolos ecológicos genéricos (hojas, tierra, etc.)", "peso": 30, "detectado": true},
+    {"criterio": "Uso de colores fríos/naturales no relacionados con el producto (azul, verde)", "peso": 20, "detectado": true},
+    {"criterio": "Entorno natural (bosque, playa, agua) como fondo del producto", "peso": 20, "detectado": false},
+    {"criterio": "Presencia de animales", "peso": 10, "detectado": false},
+    {"criterio": "Muestra el producto con familia (conexión emocional)", "peso": 5, "detectado": true},
+    {"criterio": "Elementos característicos del país (bandera, trajes típicos)", "peso": 5, "detectado": false},
+    {"criterio": "Símbolo claro como una hoja o folio de un árbol en color azul o verde", "peso": 10, "detectado": true}
+  ],
+  "incompletitudes": {
+    "valores_afirmativos": {
+      "sostenibilidad": true,
+      "libertad": true,
+      "tecnologia": true,
+      "metas_aspiracionales": false,
+      "impactos_positivos": true
+    },
+    "impactos_criticos": {
+      "extraccion_minerales": false,
+      "paises_origen": false
+    },
+    "contexto_social": {
+      "geografia_pais": false,
+      "infraestructura_carga": false,
+      "infraestructura_vial": false,
+      "climatologia": false
+    }
+  },
+  "analisis_normativo_certificaciones": {
+    "fecha_publicacion_detectada": "2023-05-15 o 'No detectada'",
+    "marco_legal_aplicable": {
+      "ley_1931_2018": {
+        "aplicable": true,
+        "descripcion": "Ley de cambio climático - Aplica a vehículos eléctricos posteriores a 2018"
+      },
+      "ley_1964_2019": {
+        "aplicable": true,
+        "beneficios_mencionados": {
+          "rebaja_impuesto_vehicular": false,
+          "descuento_soat": false,
+          "exencion_pico_placa": true
+        }
+      },
+      "normativas_locales": {
+        "mencionadas": false,
+        "descripcion": "Rebaja impuestos y parqueo preferencial"
+      }
+    },
+    "certificaciones_internacionales": {
+      "wltp_comision_europea": {
+        "presente": false,
+        "descripcion": "Sello o mención de WLTP (consumo energía, emisiones, autonomía)"
+      },
+      "ghg_protocol": {
+        "presente": false,
+        "descripcion": "Greenhouse Gas Protocol - Emisiones directas e indirectas"
+      },
+      "iso_14044": {
+        "presente": false,
+        "descripcion": "ISO 14044 - Análisis ciclo de vida (baterías, tierras raras, huella hídrica)"
+      },
+      "epa": {
+        "presente": false,
+        "descripcion": "EPA - Calidad ambiental y métricas de eficiencia"
+      }
+    },
+    "cherry_picking_detectado": {
+      "presente": false,
+      "evidencias": "Descripción de datos selectivos o escenarios que favorecen sostenibilidad sin contexto completo",
+      "ejemplos": ["Solo muestra autonomía, omite tiempo de carga", "Solo menciona cero emisiones, omite producción"]
+    },
+    "analisis_cumplimiento": "Evaluación general del cumplimiento normativo y transparencia en certificaciones"
+  },
+  "analisis_cualitativo": {
+    "identificacion_producto": "BYD Atto 3 - Vehículo eléctrico",
+    "fuente": "Facebook / Instagram",
+    "criterios_adicionales_solicitados": "Revisar huella de carbono, analizar materiales utilizados",
+    "hallazgos_criterios_adicionales": "Respecto a los criterios adicionales solicitados: [descripción de hallazgos o 'No se encontró información específica sobre estos criterios en la publicidad']",
+    "afirmaciones_clave": ["100% Ecológico", "Cero emisiones", "Movilidad sostenible"],
+    "evaluacion_greencheck": "La publicidad presenta el producto como solución ambiental absoluta, utilizando narrativas de libertad y status social. Se detecta uso estratégico de colores verdes y azules.",
+    "greenwashing_detectado": "Afirmación '100% Ecológico' es exageración que omite impactos de producción de baterías (litio, cobalto). Uso de colores fríos para crear halo de naturaleza sobre producto industrial.",
+    "puntos_verdes": "El vehículo eléctrico es genuina alternativa a combustión interna. Reduce contaminación local en uso urbano.",
+    "clasificacion": "Moderado Riesgo de Greenwashing",
+    "recomendacion": "Reemplazar '100% Ecológico' por 'Cero Emisiones en Uso'. Incluir información sobre origen de baterías y reciclaje."
+  }
+}`;
+
+            const payload = {
+                contents: [{
+                    role: "user",
+                    parts: [
+                        { text: `Analiza esta publicidad de tecnología verde siguiendo la estructura JSON indicada.
+
+${additionalCriteria !== 'Ninguno' ? `CRITERIOS ADICIONALES SOLICITADOS POR EL USUARIO: "${additionalCriteria}"
+Por favor, en el campo "criterios_adicionales_solicitados" copia exactamente estos criterios, y en "hallazgos_criterios_adicionales" describe brevemente si encuentras información relacionada con estos criterios en la publicidad, o indica claramente si no se encontró información sobre ellos.` : ''}
+
+RESPONDE SOLO CON JSON, SIN TEXTO ADICIONAL.` },
+                        { inlineData: { mimeType: "image/jpeg", data: base64Image } }
+                    ]
+                }],
+                systemInstruction: { parts: [{ text: systemInstruction }] }
+            };
+
+            try {
+                const response = await fetch(`${API_URL}?key=${API_KEY}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) throw new Error(`Error API: ${response.status}`);
+
+                const result = await response.json();
+                let text = result?.candidates?.[0]?.content?.parts?.[0]?.text;
+
+                if (text) {
+                    text = text.replace(/```json/g, '').replace(/```/g, '').trim();
+                    analysisData = JSON.parse(text);
+                    displayResults();
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error en el análisis: ' + error.message);
+            } finally {
+                document.getElementById('loading').classList.add('hidden');
+                document.getElementById('analyze-button').disabled = false;
+            }
+        }
+
+        function displayResults() {
+            document.getElementById('results-section').classList.remove('hidden');
+            document.getElementById('results-section').scrollIntoView({ behavior: 'smooth' });
+
+            displayZioloBak();
+            displayRadarChart();
+            displayBreakdown();
+            displayIncompletitudes();
+            displayPieChart();
+            displayQualitativeAnalysis();
+            displayNormativeAnalysis(); // NUEVO
+        }
+
+        function displayZioloBak() {
+            const zb = analysisData.ziolo_bak;
+            
+            const categories = [
+                { 
+                    label: 'Ejecucional nivel empresa', 
+                    desc: 'Uso de símbolos, colores, sonidos y narrativas verdes asociados a la marca',
+                    presente: zb.ejecucional_empresa.presente,
+                    componentes: zb.ejecucional_empresa.componentes_detectados
+                },
+                { 
+                    label: 'Afirmación nivel empresa', 
+                    desc: 'Declaraciones institucionales (ej: "comprometidos con el cambio climático", "cero emisiones")',
+                    presente: zb.afirmacion_empresa.presente,
+                    componentes: zb.afirmacion_empresa.componentes_detectados
+                },
+                { 
+                    label: 'Ejecucional nivel producto', 
+                    desc: 'Recursos visuales que aparentan sostenibilidad (hojas, gotas de agua, elementos ambientales)',
+                    presente: zb.ejecucional_producto.presente,
+                    componentes: zb.ejecucional_producto.componentes_detectados
+                },
+                { 
+                    label: 'Afirmación nivel producto', 
+                    desc: 'Frases que acompañan la publicidad (ej: "emisiones 0", "100% natural", "ecológico")',
+                    presente: zb.afirmacion_producto.presente,
+                    componentes: zb.afirmacion_producto.componentes_detectados
+                }
+            ];
+
+            let html = `
+                <table class="w-full">
+                    <thead>
+                        <tr class="bg-gray-200">
+                            <th class="text-left p-3">Categoría Ziolo-Bak</th>
+                            <th class="text-left p-3">Descripción</th>
+                            <th class="text-center p-3 w-24">Presente</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            categories.forEach(cat => {
+                const presente = cat.presente ? 'SÍ' : 'NO';
+                const presenteColor = cat.presente ? 'text-red-600 font-bold' : 'text-green-600 font-bold';
+                const rowBg = cat.presente ? 'bg-red-50' : 'bg-green-50';
+                
+                html += `
+                    <tr class="${rowBg}">
+                        <td class="p-3 font-semibold">${cat.label}</td>
+                        <td class="p-3 text-sm">
+                            <div class="text-gray-600 mb-1">${cat.desc}</div>
+                            <div class="text-gray-800 italic">${cat.componentes}</div>
+                        </td>
+                        <td class="p-3 text-center text-2xl ${presenteColor}">${presente}</td>
+                    </tr>
+                `;
+            });
+
+            html += `
+                    </tbody>
+                </table>
+            `;
+
+            document.getElementById('ziolo-bak-content').innerHTML = html;
+        }
+
+        function displayRadarChart() {
+            const ctx = document.getElementById('radar-chart').getContext('2d');
+            if (radarChart) radarChart.destroy();
+
+            const disc = analysisData.discursos_hickman;
+            radarChart = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: ['Estatus social', 'Libertad de movimiento', 'Solución ambiental', 'Mensaje ecológico', 'Simplicidad y eficiencia', 'Normativas gubernamentales'],
+                    datasets: [{
+                        label: 'Intensidad del discurso',
+                        data: [disc.estatus_social, disc.libertad_movimiento, disc.solucion_ambiental, disc.mensaje_ecologico, disc.simplicidad_eficiencia, disc.normativas],
+                        backgroundColor: 'rgba(5, 150, 105, 0.2)',
+                        borderColor: 'rgb(5, 150, 105)',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            suggestedMin: 10,
+                            suggestedMax: 100,
+                            ticks: { stepSize: 10 }
+                        }
+                    }
+                }
+            });
+        }
+
+        function displayBreakdown() {
+            const breakdown = analysisData.desglose_greenwashing;
+            let totalDetected = 0;
+
+            let html = '<table><thead><tr><th>Criterio (Discurso Implícito)</th><th class="text-center">Peso Máximo</th><th class="text-center">Detectado</th><th class="text-center">Puntuación Sumada</th></tr></thead><tbody>';
+
+            breakdown.forEach(item => {
+                const score = item.detectado ? item.peso : 0;
+                totalDetected += score;
+                const checkIcon = item.detectado ? '✓' : '✗';
+                const rowClass = item.detectado ? 'bg-red-50' : 'bg-green-50';
+
+                html += `<tr class="${rowClass}"><td>${item.criterio}</td><td class="text-center font-semibold">${item.peso}%</td><td class="text-center text-2xl">${checkIcon}</td><td class="text-center font-bold">${score}%</td></tr>`;
+            });
+
+            html += `</tbody><tfoot class="bg-red-100"><tr><td colspan="3" class="text-right font-bold text-lg">TOTAL GREENWASHING DETECTADO:</td><td class="text-center font-bold text-xl text-red-600">${totalDetected}%</td></tr></tfoot></table>`;
+
+            document.getElementById('breakdown-content').innerHTML = html;
+        }
+
+        function displayIncompletitudes() {
+            const inc = analysisData.incompletitudes;
+            
+            let html = '<table><thead><tr><th>Concepto detallado</th><th class="text-center">Mencionado</th><th class="text-center">Inferencia</th></tr></thead><tbody>';
+
+            const sections = [
+                { title: 'Valores afirmativos y metas', data: inc.valores_afirmativos, labels: ['Sostenibilidad', 'Libertad', 'Tecnología', 'Metas aspiracionales', 'Impactos positivos'] },
+                { title: 'Impactos críticos (Greenwashing faltante)', data: inc.impactos_criticos, labels: ['Extracción de minerales', 'Países de origen'] },
+                { title: 'Contexto social/operacional', data: inc.contexto_social, labels: ['Geografía del país', 'Infraestructura de carga', 'Infraestructura vial', 'Climatología'] }
+            ];
+
+            sections.forEach(section => {
+                html += `<tr class="bg-blue-100"><td colspan="3" class="font-bold">${section.title}</td></tr>`;
+                const keys = Object.keys(section.data);
+                keys.forEach((key, i) => {
+                    const mentioned = section.data[key];
+                    const icon = mentioned ? '✓' : '✗';
+                    const color = mentioned ? 'text-green-600' : 'text-red-600';
+                    html += `<tr><td>${section.labels[i]}</td><td class="text-center ${color} text-xl">${icon}</td><td class="text-center ${color} text-xl">${icon}</td></tr>`;
+                });
+            });
+
+            html += '</tbody></table>';
+            document.getElementById('incompletitudes-content').innerHTML = html;
+        }
+
+        function displayPieChart() {
+            const breakdown = analysisData.desglose_greenwashing;
+            const greenwashing = breakdown.filter(item => item.detectado).reduce((sum, item) => sum + item.peso, 0);
+            const legitimate = 100 - greenwashing;
+
+            const ctx = document.getElementById('pie-chart').getContext('2d');
+            if (pieChart) pieChart.destroy();
+
+            pieChart = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: [`Greenwashing detectado (${greenwashing}%)`, `Afirmaciones legítimas/neutrales (${legitimate}%)`],
+                    datasets: [{
+                        data: [greenwashing, legitimate],
+                        backgroundColor: ['#dc2626', '#059669']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+        }
+
+        function displayQualitativeAnalysis() {
+            const qa = analysisData.analisis_cualitativo;
+            
+            let html = `
+                <div class="space-y-4">
+                    <div><h4 class="font-bold text-gray-900">Identificación del producto</h4><p>${qa.identificacion_producto}</p></div>
+                    <div><h4 class="font-bold text-gray-900">Fuente</h4><p>${qa.fuente}</p></div>`;
+            
+            // Mostrar criterios adicionales si fueron solicitados
+            if (qa.criterios_adicionales_solicitados && qa.criterios_adicionales_solicitados !== 'Ninguno') {
+                html += `
+                    <div class="bg-blue-50 p-4 rounded-lg border-2 border-blue-300">
+                        <h4 class="font-bold text-blue-900">Criterios adicionales solicitados</h4>
+                        <p class="text-sm text-gray-700 mb-2 italic">${qa.criterios_adicionales_solicitados}</p>
+                        <h5 class="font-semibold text-blue-800 mt-3">Hallazgos:</h5>
+                        <p class="text-gray-800">${qa.hallazgos_criterios_adicionales}</p>
+                    </div>`;
+            }
+            
+            html += `
+                    <div><h4 class="font-bold text-gray-900">Afirmaciones clave</h4><ul class="list-disc pl-5">${qa.afirmaciones_clave.map(a => `<li>${a}</li>`).join('')}</ul></div>
+                    <div><h4 class="font-bold text-gray-900">Evaluación GreenCheck</h4><p>${qa.evaluacion_greencheck}</p></div>
+                    <div class="bg-red-50 p-4 rounded-lg"><h4 class="font-bold text-red-900">Greenwashing detectado</h4><p>${qa.greenwashing_detectado}</p></div>
+                    <div class="bg-green-50 p-4 rounded-lg"><h4 class="font-bold text-green-900">Puntos verdes</h4><p>${qa.puntos_verdes}</p></div>
+                    <div class="bg-yellow-50 p-4 rounded-lg border-2 border-yellow-400"><h4 class="font-bold text-yellow-900">Clasificación GreenCheck</h4><p class="text-xl font-bold">${qa.clasificacion}</p></div>
+                    <div><h4 class="font-bold text-gray-900">Recomendación</h4><p>${qa.recomendacion}</p></div>
+                </div>
+            `;
+
+            document.getElementById('qualitative-analysis').innerHTML = html;
+        }
+
+        // NUEVA FUNCIÓN: Mostrar análisis normativo y certificaciones
+        function displayNormativeAnalysis() {
+            const na = analysisData.analisis_normativo_certificaciones;
+            
+            if (!na) {
+                document.getElementById('normative-analysis').innerHTML = '<p class="text-gray-500">No hay datos de análisis normativo disponibles.</p>';
+                return;
+            }
+            
+            let html = `
+                <div class="bg-blue-50 p-4 rounded-lg border-2 border-blue-300 mb-4">
+                    <h4 class="font-bold text-blue-900 mb-2">Fecha de publicación detectada</h4>
+                    <p class="text-lg text-gray-800">${na.fecha_publicacion_detectada || 'No detectada'}</p>
+                </div>
+
+                <div class="mb-6">
+                    <h4 class="font-bold text-gray-900 mb-3 text-lg border-b-2 border-gray-300 pb-2">Marco legal colombiano aplicable</h4>
+                    
+                    <div class="space-y-3">
+                        <div class="border-l-4 border-green-500 pl-4 py-2 ${na.marco_legal_aplicable.ley_1931_2018.aplicable ? 'bg-green-50' : 'bg-gray-50'}">
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <span class="font-semibold">Ley 1931 de 2018</span>
+                                    <p class="text-sm text-gray-600">${na.marco_legal_aplicable.ley_1931_2018.descripcion}</p>
+                                </div>
+                                <span class="text-lg font-bold ${na.marco_legal_aplicable.ley_1931_2018.aplicable ? 'text-green-600' : 'text-gray-400'}">
+                                    ${na.marco_legal_aplicable.ley_1931_2018.aplicable ? 'APLICABLE' : 'N/A'}
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="border-l-4 border-blue-500 pl-4 py-3 bg-blue-50">
+                            <div class="font-semibold mb-3">Ley 1964 de 2019 - Beneficios mencionados en publicidad:</div>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-2 text-sm">
+                                <div class="flex items-center justify-between p-2 bg-white rounded">
+                                    <span>Rebaja impuesto (1%)</span>
+                                    <span class="font-bold ${na.marco_legal_aplicable.ley_1964_2019.beneficios_mencionados.rebaja_impuesto_vehicular ? 'text-green-600' : 'text-red-600'}">
+                                        ${na.marco_legal_aplicable.ley_1964_2019.beneficios_mencionados.rebaja_impuesto_vehicular ? 'SÍ' : 'NO'}
+                                    </span>
+                                </div>
+                                <div class="flex items-center justify-between p-2 bg-white rounded">
+                                    <span>Descuento SOAT (10%)</span>
+                                    <span class="font-bold ${na.marco_legal_aplicable.ley_1964_2019.beneficios_mencionados.descuento_soat ? 'text-green-600' : 'text-red-600'}">
+                                        ${na.marco_legal_aplicable.ley_1964_2019.beneficios_mencionados.descuento_soat ? 'SÍ' : 'NO'}
+                                    </span>
+                                </div>
+                                <div class="flex items-center justify-between p-2 bg-white rounded">
+                                    <span>Exención pico y placa</span>
+                                    <span class="font-bold ${na.marco_legal_aplicable.ley_1964_2019.beneficios_mencionados.exencion_pico_placa ? 'text-green-600' : 'text-red-600'}">
+                                        ${na.marco_legal_aplicable.ley_1964_2019.beneficios_mencionados.exencion_pico_placa ? 'SÍ' : 'NO'}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="border-l-4 border-purple-500 pl-4 py-2 ${na.marco_legal_aplicable.normativas_locales.mencionadas ? 'bg-purple-50' : 'bg-gray-50'}">
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <span class="font-semibold">Normativas locales</span>
+                                    <p class="text-sm text-gray-600">${na.marco_legal_aplicable.normativas_locales.descripcion}</p>
+                                </div>
+                                <span class="text-lg font-bold ${na.marco_legal_aplicable.normativas_locales.mencionadas ? 'text-green-600' : 'text-red-600'}">
+                                    ${na.marco_legal_aplicable.normativas_locales.mencionadas ? 'MENCIONADO' : 'NO MENCIONADO'}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-6">
+                    <h4 class="font-bold text-gray-900 mb-3 text-lg border-b-2 border-gray-300 pb-2">Certificaciones y estándares internacionales</h4>
+                    
+                    <table class="w-full">
+                        <thead>
+                            <tr class="bg-gray-200">
+                                <th class="text-left p-3">Certificación/Estándar</th>
+                                <th class="text-left p-3">Descripción</th>
+                                <th class="text-center p-3 w-32">Presente</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="${na.certificaciones_internacionales.wltp_comision_europea.presente ? 'bg-green-50' : 'bg-red-50'}">
+                                <td class="p-3 font-semibold">WLTP</td>
+                                <td class="p-3 text-sm">${na.certificaciones_internacionales.wltp_comision_europea.descripcion}</td>
+                                <td class="p-3 text-center text-xl font-bold ${na.certificaciones_internacionales.wltp_comision_europea.presente ? 'text-green-600' : 'text-red-600'}">
+                                    ${na.certificaciones_internacionales.wltp_comision_europea.presente ? 'SÍ' : 'NO'}
+                                </td>
+                            </tr>
+                            <tr class="${na.certificaciones_internacionales.ghg_protocol.presente ? 'bg-green-50' : 'bg-red-50'}">
+                                <td class="p-3 font-semibold">GHG Protocol</td>
+                                <td class="p-3 text-sm">${na.certificaciones_internacionales.ghg_protocol.descripcion}</td>
+                                <td class="p-3 text-center text-xl font-bold ${na.certificaciones_internacionales.ghg_protocol.presente ? 'text-green-600' : 'text-red-600'}">
+                                    ${na.certificaciones_internacionales.ghg_protocol.presente ? 'SÍ' : 'NO'}
+                                </td>
+                            </tr>
+                            <tr class="${na.certificaciones_internacionales.iso_14044.presente ? 'bg-green-50' : 'bg-red-50'}">
+                                <td class="p-3 font-semibold">ISO 14044</td>
+                                <td class="p-3 text-sm">${na.certificaciones_internacionales.iso_14044.descripcion}</td>
+                                <td class="p-3 text-center text-xl font-bold ${na.certificaciones_internacionales.iso_14044.presente ? 'text-green-600' : 'text-red-600'}">
+                                    ${na.certificaciones_internacionales.iso_14044.presente ? 'SÍ' : 'NO'}
+                                </td>
+                            </tr>
+                            <tr class="${na.certificaciones_internacionales.epa.presente ? 'bg-green-50' : 'bg-red-50'}">
+                                <td class="p-3 font-semibold">EPA</td>
+                                <td class="p-3 text-sm">${na.certificaciones_internacionales.epa.descripcion}</td>
+                                <td class="p-3 text-center text-xl font-bold ${na.certificaciones_internacionales.epa.presente ? 'text-green-600' : 'text-red-600'}">
+                                    ${na.certificaciones_internacionales.epa.presente ? 'SÍ' : 'NO'}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="border-2 ${na.cherry_picking_detectado.presente ? 'border-red-500 bg-red-50' : 'border-green-500 bg-green-50'} rounded-lg p-4">
+                    <h4 class="font-bold ${na.cherry_picking_detectado.presente ? 'text-red-900' : 'text-green-900'} mb-2 flex items-center text-lg">
+                        <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                        </svg>
+                        Cherry Picking (Selección Selectiva de Datos)
+                    </h4>
+                    <div class="mb-2">
+                        <span class="font-semibold">Detectado: </span>
+                        <span class="text-2xl font-bold ${na.cherry_picking_detectado.presente ? 'text-red-600' : 'text-green-600'}">
+                            ${na.cherry_picking_detectado.presente ? 'SÍ' : 'NO'}
+                        </span>
+                    </div>
+                    <p class="text-sm text-gray-700 mb-2"><strong>Evidencias:</strong> ${na.cherry_picking_detectado.evidencias}</p>
+                    ${na.cherry_picking_detectado.ejemplos && na.cherry_picking_detectado.ejemplos.length > 0 ? `
+                        <div class="text-sm">
+                            <strong>Ejemplos detectados:</strong>
+                            <ul class="list-disc pl-5 mt-1">
+                                ${na.cherry_picking_detectado.ejemplos.map(ej => `<li>${ej}</li>`).join('')}
+                            </ul>
+                        </div>
+                    ` : ''}
+                </div>
+
+                <div class="mt-4 p-4 bg-gray-100 rounded-lg border-l-4 border-gray-600">
+                    <h4 class="font-bold text-gray-900 mb-2">Evaluación general de cumplimiento normativo</h4>
+                    <p class="text-gray-800">${na.analisis_cumplimiento}</p>
+                </div>
+            `;
+
+            document.getElementById('normative-analysis').innerHTML = html;
+        }
+
+    </script>
+</body>
+</html>
